@@ -1,15 +1,57 @@
-#include <iostream>
-#include <unistd.h>
+#include <QFile>
+#include <QTextStream>
+#include <QDebug>
 
-using namespace std;
+class TextFile{
 
-int main(){
-	cout << "Will load 10 seconds" << endl << "Loading";
-	for(int count = 0; count < 10; ++ count){
-		cout << ".  ";
-		fflush(stdout);
-		sleep(1);
-	}
-	cout << endl << "Done" << endl;
-	return 0;
+public:
+    bool read_text (const QString &fileName){
+        QFile file(fileName);
+        if (!file.open(QIODevice::ReadOnly | QIODevice::Text)){
+            qDebug() << "Can not open file";
+            return false;
+        }
+
+        QTextStream in(&file);
+        in.setCodec("UTF-8");
+
+        while(!in.atEnd()){
+            QString line = in.readLine();
+            qDebug() << line;
+
+        }
+
+        file.close();
+        return true;
+    }
+
+    bool write_text (const QString &fileName, const QString &data){
+        QFile file(fileName);
+        if (!file.open(QIODevice::Append | QIODevice::Text)){
+            qDebug() << "Can not file to write";
+            return false;
+        }
+
+        QTextStream out(&file);
+        out.setCodec("UTF-8");
+
+        out << data;
+
+        file.close();
+        return true;
+    }
+
+    ~TextFile(){
+    }
+};
+
+int main()
+{
+    TextFile TXT;
+
+    TXT.read_text("../LevelUpHW/text.txt");
+    TXT.write_text("../LevelUpHW/text.txt", "New data");
+    TXT.read_text("../LevelUpHW/text.txt");
+
+    return 0;
 }
